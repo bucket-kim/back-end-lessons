@@ -1,72 +1,61 @@
-const express = require('express');
-const tourController = require('../controllers/tourControllers');
-const authController = require('../controllers/authController');
+const express = require("express");
+const tourController = require("./../controllers/tourControllers");
+const authController = require("./../controllers/authController");
+const reviewRouter = require("./../routes/reviewRoutes");
+
 const router = express.Router();
-const reviewRouter = require('./reviewRoutes');
 
-// router.param("id", tourController.checkID);
+// router.param('id', tourController.checkID);
 
-// create a checkbody middleware
-// check if body contains the name and price property
-// if not, send 400(bad request)
-// Add it to the post handler stack
+// POST /tour/234fad4/reviews
+// GET /tour/234fad4/reviews
 
-// Post /tour/1028hro23ifn/reviews
-// GET /tour/20938u41241/reviews
-// GET /tour/20938u41241/reviews/2398fhs
-
-// router
-//   .route('/:tourId/reviews')
-//   .post(
-//     authController.protect,
-//     authController.restrictTo('user'),
-//     reviewController.createReviews
-//   );
-
-router.use('/:tourId/reviews', reviewRouter);
+router.use("/:tourId/reviews", reviewRouter);
 
 router
-  .route('/top-5-cheap')
-  .get(tourController.aliasTop, tourController.getAllDatas);
+  .route("/top-5-cheap")
+  .get(tourController.aliasTopTours, tourController.getAllTours);
 
-router.route('/tour-stats').get(tourController.getTourStats);
+router.route("/tour-stats").get(tourController.getTourStats);
 router
-  .route('/monthly-plan/:year')
+  .route("/monthly-plan/:year")
   .get(
     authController.protect,
-    authController.restrictTo('admin', 'lead-guide', 'guide'),
+    authController.restrictTo("admin", "lead-guide", "guide"),
     tourController.getMonthlyPlan
   );
 
 router
-  .route('/tours-within/:distance/center/:latlng/unit/:unit')
-  .get(tourController.getToursDistance);
+  .route("/tours-within/:distance/center/:latlng/unit/:unit")
+  .get(tourController.getToursWithin);
+// /tours-within?distance=233&center=-40,45&unit=mi
+// /tours-within/233/center/-40,45/unit/mi
 
-router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+router.route("/distances/:latlng/unit/:unit").get(tourController.getDistances);
 
 router
-  .route('/')
-  .get(tourController.getAllDatas)
+  .route("/")
+  .get(tourController.getAllTours)
   .post(
     authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
-    tourController.createData
+    authController.restrictTo("admin", "lead-guide"),
+    tourController.createTour
   );
 
 router
-  .route('/:id')
-  .get(tourController.getAllData)
+  .route("/:id")
+  .get(tourController.getTour)
   .patch(
     authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
+    authController.restrictTo("admin", "lead-guide"),
     tourController.uploadTourImages,
     tourController.resizeTourImages,
-    tourController.updateData
+    tourController.updateTour
   )
   .delete(
     authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
-    tourController.deleteData
+    authController.restrictTo("admin", "lead-guide"),
+    tourController.deleteTour
   );
 
 module.exports = router;
